@@ -20,6 +20,7 @@ import {
 	contentWidthArr,
 	defaultArticleState,
 } from 'src/constants/articleProps';
+// Импортируем интерфейс из правильного файла (который мы только что создали)
 import { IAllOptions } from 'src/index';
 
 export type ChangeSelectFn = (selection: OptionType) => void;
@@ -76,8 +77,8 @@ export const ArticleParamsForm = ({
 						title='Шрифт'
 						selected={formState.fontFamilyOption}
 						options={fontFamilyOptions}
-						onChange={(selected) =>
-							setFormState((oldState) => ({
+						onChange={(selected: OptionType) =>
+							setFormState((oldState: IAllOptions) => ({
 								...oldState,
 								fontFamilyOption: selected,
 							}))
@@ -90,8 +91,8 @@ export const ArticleParamsForm = ({
 						name='font-size'
 						selected={formState.fontSizeOption}
 						options={fontSizeOptions}
-						onChange={(selected) =>
-							setFormState((oldState) => ({
+						onChange={(selected: OptionType) =>
+							setFormState((oldState: IAllOptions) => ({
 								...oldState,
 								fontSizeOption: selected,
 							}))
@@ -103,8 +104,11 @@ export const ArticleParamsForm = ({
 						title='Цвет шрифта'
 						selected={formState.fontColor}
 						options={fontColors}
-						onChange={(selected) =>
-							setFormState((oldState) => ({ ...oldState, fontColor: selected }))
+						onChange={(selected: OptionType) =>
+							setFormState((oldState: IAllOptions) => ({
+								...oldState,
+								fontColor: selected,
+							}))
 						}
 					/>
 
@@ -116,8 +120,8 @@ export const ArticleParamsForm = ({
 						title='Цвет фона'
 						selected={formState.backgroundColor}
 						options={backgroundColors}
-						onChange={(selected) =>
-							setFormState((oldState) => ({
+						onChange={(selected: OptionType) =>
+							setFormState((oldState: IAllOptions) => ({
 								...oldState,
 								backgroundColor: selected,
 							}))
@@ -129,8 +133,8 @@ export const ArticleParamsForm = ({
 						title='Ширина контента'
 						selected={formState.contentWidth}
 						options={contentWidthArr}
-						onChange={(selected) =>
-							setFormState((oldState) => ({
+						onChange={(selected: OptionType) =>
+							setFormState((oldState: IAllOptions) => ({
 								...oldState,
 								contentWidth: selected,
 							}))
