@@ -26,17 +26,18 @@ interface PropsArticleParamsForm {
 	/** Функция для изменения состояния страницы */
 	setPageState: React.Dispatch<React.SetStateAction<IAllOptions>>;
 	/** Начальное состояние открытия (по умолчанию закрыто) */
-	initialOpenState?: boolean;
+	toggleOpenFn: () => void;
+	/** Новый проп для управления состоянием открытия */
+	isOpen: boolean;
 }
 
 export const ArticleParamsForm = ({
 	setPageState,
-	initialOpenState = false,
+	toggleOpenFn,
+	isOpen,
 }: PropsArticleParamsForm) => {
 	// Состояние для хранения текущих значений формы
 	const [formState, setFormState] = useState<IAllOptions>(defaultArticleState);
-	// Состояние открытия/закрытия формы
-	const [isOpen, setIsOpen] = useState<boolean>(initialOpenState);
 
 	// Функция для сброса формы на значения по умолчанию
 	function setDefaultOptions() {
@@ -50,35 +51,36 @@ export const ArticleParamsForm = ({
 		setPageState(formState);
 	}
 
-	// Функция переключения состояния открытия/закрытия
-	const toggleOpen = useCallback(() => {
-		setIsOpen((prev) => !prev);
-	}, []);
-
 	// Обработчик клика вне компонента
-	const handleClickOutside = useCallback((event: MouseEvent) => {
-		const asideElement = document.querySelector(`.${styles.container}`);
-		const arrowButton = document.querySelector(
-			'button[aria-label="Toggle settings panel"]'
-		); // Предполагаемый селектор кнопки
+	const handleClickOutside = useCallback(
+		(event: MouseEvent) => {
+			const asideElement = document.querySelector(`.${styles.container}`);
+			const arrowButton = document.querySelector(
+				'button[aria-label="Toggle settings panel"]'
+			); // Предполагаемый селектор кнопки
 
-		// Проверяем, что клик не был по сайдбару или по кнопке открытия
-		if (
-			asideElement &&
-			!asideElement.contains(event.target as Node) &&
-			arrowButton &&
-			!arrowButton.contains(event.target as Node)
-		) {
-			setIsOpen(false);
-		}
-	}, []);
+			// Проверяем, что клик не был по сайдбару или по кнопке открытия
+			if (
+				asideElement &&
+				!asideElement.contains(event.target as Node) &&
+				arrowButton &&
+				!arrowButton.contains(event.target as Node)
+			) {
+				toggleOpenFn(); // Закрываем сайдбар
+			}
+		},
+		[toggleOpenFn]
+	);
 
 	// Обработчик нажатия клавиши ESC
-	const handleEscPress = useCallback((event: KeyboardEvent) => {
-		if (event.key === 'Escape') {
-			setIsOpen(false);
-		}
-	}, []);
+	const handleEscPress = useCallback(
+		(event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				toggleOpenFn();
+			}
+		},
+		[toggleOpenFn]
+	);
 
 	// Эффект для добавления/удаления обработчиков событий
 	useEffect(() => {
@@ -98,7 +100,7 @@ export const ArticleParamsForm = ({
 	return (
 		<>
 			{/* Кнопка для открытия/закрытия формы */}
-			<ArrowButton toggleOpenFn={toggleOpen} openState={isOpen} />
+			<ArrowButton toggleOpenFn={toggleOpenFn} openState={isOpen} />
 
 			{/* Основной контейнер формы с динамическим классом в зависимости от состояния открытия */}
 			<aside

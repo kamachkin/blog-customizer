@@ -51,8 +51,8 @@ const App = () => {
 			}>
 			<ArticleParamsForm
 				toggleOpenFn={toggleOpenForm}
-				openState={isFormOpen}
 				setPageState={setPageState}
+				isOpen={isFormOpen}
 			/>
 			<Article closeFn={closeForm} />
 		</main>
