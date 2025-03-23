@@ -9,7 +9,6 @@ import { defaultArticleState, OptionType } from './constants/articleProps';
 import './styles/index.scss';
 import styles from './styles/index.module.scss';
 
-// Определение интерфейса IAllOptions
 export interface IAllOptions {
 	fontFamilyOption: OptionType;
 	fontSizeOption: OptionType;
@@ -22,20 +21,7 @@ const domNode = document.getElementById('root') as HTMLDivElement;
 const root = createRoot(domNode);
 
 const App = () => {
-	// Состояние для хранения настроек статьи
 	const [pageState, setPageState] = useState<IAllOptions>(defaultArticleState);
-	// Состояние открытия/закрытия формы
-	const [isFormOpen, setIsFormOpen] = useState(false);
-
-	// Функция для переключения состояния открытия формы
-	const toggleOpenForm = () => {
-		setIsFormOpen(!isFormOpen);
-	};
-
-	// Функция для закрытия формы (используется при клике на статью)
-	const closeForm = () => {
-		setIsFormOpen(false);
-	};
 
 	return (
 		<main
@@ -49,12 +35,8 @@ const App = () => {
 					'--bg-color': pageState.backgroundColor.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm
-				toggleOpenFn={toggleOpenForm}
-				setPageState={setPageState}
-				isOpen={isFormOpen}
-			/>
-			<Article closeFn={closeForm} />
+			<ArticleParamsForm setPageState={setPageState} />
+			<Article closeFn={() => {}} />
 		</main>
 	);
 };

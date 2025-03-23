@@ -25,19 +25,19 @@ export type ChangeSelectFn = (selection: OptionType) => void;
 interface PropsArticleParamsForm {
 	/** Функция для изменения состояния страницы */
 	setPageState: React.Dispatch<React.SetStateAction<IAllOptions>>;
-	/** Начальное состояние открытия (по умолчанию закрыто) */
-	toggleOpenFn: () => void;
-	/** Новый проп для управления состоянием открытия */
-	isOpen: boolean;
 }
 
-export const ArticleParamsForm = ({
-	setPageState,
-	toggleOpenFn,
-	isOpen,
-}: PropsArticleParamsForm) => {
+export const ArticleParamsForm = ({ setPageState }: PropsArticleParamsForm) => {
+	// Локальное состояние для управления открытием/закрытием формы
+	const [isOpen, setIsOpen] = useState(false);
+
 	// Состояние для хранения текущих значений формы
 	const [formState, setFormState] = useState<IAllOptions>(defaultArticleState);
+
+	// Функция для переключения состояния открытия формы
+	const toggleOpen = () => {
+		setIsOpen((prev) => !prev);
+	};
 
 	// Функция для сброса формы на значения по умолчанию
 	function setDefaultOptions() {
@@ -52,45 +52,34 @@ export const ArticleParamsForm = ({
 	}
 
 	// Обработчик клика вне компонента
-	const handleClickOutside = useCallback(
-		(event: MouseEvent) => {
-			const asideElement = document.querySelector(`.${styles.container}`);
-			const arrowButton = document.querySelector(
-				'button[aria-label="Toggle settings panel"]'
-			); // Предполагаемый селектор кнопки
-
-			// Проверяем, что клик не был по сайдбару или по кнопке открытия
-			if (
-				asideElement &&
-				!asideElement.contains(event.target as Node) &&
-				arrowButton &&
-				!arrowButton.contains(event.target as Node)
-			) {
-				toggleOpenFn(); // Закрываем сайдбар
-			}
-		},
-		[toggleOpenFn]
-	);
+	const handleClickOutside = useCallback((event: MouseEvent) => {
+		const asideElement = document.querySelector(`.${styles.container}`);
+		const arrowButton = document.querySelector(
+			'button[aria-label="Toggle settings panel"]'
+		);
+		if (
+			asideElement &&
+			!asideElement.contains(event.target as Node) &&
+			arrowButton &&
+			!arrowButton.contains(event.target as Node)
+		) {
+			setIsOpen(false);
+		}
+	}, []);
 
 	// Обработчик нажатия клавиши ESC
-	const handleEscPress = useCallback(
-		(event: KeyboardEvent) => {
-			if (event.key === 'Escape') {
-				toggleOpenFn();
-			}
-		},
-		[toggleOpenFn]
-	);
+	const handleEscPress = useCallback((event: KeyboardEvent) => {
+		if (event.key === 'Escape') {
+			setIsOpen(false);
+		}
+	}, []);
 
-	// Эффект для добавления/удаления обработчиков событий
+	// Навешиваем обработчики событий, только если форма открыта
 	useEffect(() => {
-		// Добавляем обработчики только если форма открыта
 		if (isOpen) {
 			document.addEventListener('mousedown', handleClickOutside);
 			document.addEventListener('keydown', handleEscPress);
 		}
-
-		// Очистка обработчиков при размонтировании или закрытии формы
 		return () => {
 			document.removeEventListener('mousedown', handleClickOutside);
 			document.removeEventListener('keydown', handleEscPress);
@@ -100,95 +89,85 @@ export const ArticleParamsForm = ({
 	return (
 		<>
 			{/* Кнопка для открытия/закрытия формы */}
-			<ArrowButton toggleOpenFn={toggleOpenFn} openState={isOpen} />
+			<ArrowButton toggleOpenFn={toggleOpen} openState={isOpen} />
 
-			{/* Основной контейнер формы с динамическим классом в зависимости от состояния открытия */}
+			{/* Основной контейнер формы с динамическим классом */}
 			<aside
 				className={clsx({
 					[styles.container]: true,
-					[styles.container_open]: isOpen, // Применяется если форма открыта
+					[styles.container_open]: isOpen,
 				})}>
 				{/* Форма с параметрами статьи */}
 				<form className={styles.form} onSubmit={submitForm}>
-					{/* Заголовок формы */}
 					<Text as='h1' size={31} weight={800} uppercase dynamicLite>
 						Задайте параметры
 					</Text>
 
-					{/* Выбор шрифта */}
 					<Select
 						title='Шрифт'
 						selected={formState.fontFamilyOption}
 						options={fontFamilyOptions}
 						onChange={(selected: OptionType) =>
-							setFormState((oldState: IAllOptions) => ({
+							setFormState((oldState) => ({
 								...oldState,
 								fontFamilyOption: selected,
 							}))
 						}
 					/>
 
-					{/* Выбор размера шрифта */}
 					<RadioGroup
 						title='Размер шрифта'
 						name='font-size'
 						selected={formState.fontSizeOption}
 						options={fontSizeOptions}
 						onChange={(selected: OptionType) =>
-							setFormState((oldState: IAllOptions) => ({
+							setFormState((oldState) => ({
 								...oldState,
 								fontSizeOption: selected,
 							}))
 						}
 					/>
 
-					{/* Выбор цвета шрифта */}
 					<Select
 						title='Цвет шрифта'
 						selected={formState.fontColor}
 						options={fontColors}
 						onChange={(selected: OptionType) =>
-							setFormState((oldState: IAllOptions) => ({
+							setFormState((oldState) => ({
 								...oldState,
 								fontColor: selected,
 							}))
 						}
 					/>
 
-					{/* Разделитель */}
 					<Separator />
 
-					{/* Выбор цвета фона */}
 					<Select
 						title='Цвет фона'
 						selected={formState.backgroundColor}
 						options={backgroundColors}
 						onChange={(selected: OptionType) =>
-							setFormState((oldState: IAllOptions) => ({
+							setFormState((oldState) => ({
 								...oldState,
 								backgroundColor: selected,
 							}))
 						}
 					/>
 
-					{/* Выбор ширины контента */}
 					<Select
 						title='Ширина контента'
 						selected={formState.contentWidth}
 						options={contentWidthArr}
 						onChange={(selected: OptionType) =>
-							setFormState((oldState: IAllOptions) => ({
+							setFormState((oldState) => ({
 								...oldState,
 								contentWidth: selected,
 							}))
 						}
 					/>
 
-					{/* Нижняя панель с кнопками */}
 					<div className={styles.bottomContainer}>
-						{/* Кнопка для сброса параметров */}
 						<Button title='Сбросить' type='reset' onClick={setDefaultOptions} />
-						{/* Кнопка для применения параметров */}
 						<Button title='Применить' type='submit' />
 					</div>
 				</form>
